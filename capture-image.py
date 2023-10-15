@@ -24,32 +24,34 @@ def get_sunrise_sunset():
 
     return sunrise, sunset
 
-# get the current time
-currentTime = time.time()
-print(currentTime)
 
+# set force=True if the --force command line arg has been passed
+force = False
+if len(sys.argv) > 1:
+    if sys.argv[1] == "--force":
+        force = True
+
+# get the time
+currentTime = time.time()
 sunrise, sunset = get_sunrise_sunset()
-print(sunrise, sunset)
 
 if sunrise < currentTime < sunset:
-    print("It's daytime.")
-    #sys.exit(1)
+    if not force:
+        print("It's daytime. Exiting.")
+        sys.exit(1)
 
 video_capture = cv2.VideoCapture(0)
-# Check success
 if not video_capture.isOpened():
     raise Exception("Could not open video device")
 
-# Set the FourCC for YUYV format
+# setup grayscale capture in YUYV mode
 fourcc = cv2.VideoWriter_fourcc(*'YUYV')
 video_capture.set(cv2.CAP_PROP_FOURCC, fourcc)
-
 video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
 video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 # Read picture. ret === True on success
 ret, frame = video_capture.read()
-# Close device
 video_capture.release()
 
 # set outputPath to current working directory
